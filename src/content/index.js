@@ -21,11 +21,12 @@ import { getStyles } from './css';
 import { ignoredHtmlAttributes } from './constants';
 
 let pickerActive = false;
-let nameInput;
-let formElement;
 let pageCssRules;
 
 chrome.runtime.onMessage.addListener(function (request) {
+  if (document.readyState !== 'complete') {
+    return;
+  }
   if (request.action === 'togglePicker') {
     pickerActive = !pickerActive;
     if (pickerActive) {
@@ -36,19 +37,28 @@ chrome.runtime.onMessage.addListener(function (request) {
   }
 });
 
+function getAllPageCss() {
+  // only get page css once
+  if (!pageCssRules) {
+    pageCssRules = getAllCSSRules();
+  }
+}
+
 function enablePicker() {
   setupCursor();
+  getAllPageCss();
   insertPopupHtml();
   initializeFormElements();
   addPickerEventListeners();
 }
 
 function initializeFormElements() {
-  nameInput = document.getElementById('component-name-input');
-  formElement = document.getElementById('react-component-generator-form');
+
+
 }
 
 function addPickerEventListeners() {
+  console.log('addPickerEventListeners');
   document.addEventListener('click', elementPicker, { capture: true });
   document.addEventListener(
     'mouseover',
@@ -59,7 +69,8 @@ function addPickerEventListeners() {
 }
 
 function removePickerEventListeners() {
-  document.removeEventListener('click', elementPicker);
+  console.log('removePickerEventListeners');
+  document.removeEventListener('click', elementPicker, { capture: true });
   document.removeEventListener('mouseover', (e) =>
     elementHighlight(e, pickerActive)
   );
@@ -74,21 +85,16 @@ function disablePicker() {
 }
 
 function elementPicker(e) {
-  if (!pickerActive) {
-    return;
-  }
-
   holyTrinity(e);
+  disablePicker();
+  showPopup();
 
-  if (!pageCssRules) {
-    // only get page css once
-    pageCssRules = getAllCSSRules();
-  }
 
-  pickerActive = false;
+
   const element = e.target;
 
-  showPopup();
+  const formElement = document.getElementById('react-component-generator-form');
+  const nameInput = document.getElementById('component-name-input');
 
   formElement.onsubmit = (event) => {
     const selectElement = document.getElementById('generated-type');
@@ -108,7 +114,13 @@ function elementPicker(e) {
 }
 
 function appendJsxComponent(name, tree) {
-  return `\nexport const ${name} = () => {\n  return (\n${generateJSX(tree)}\n  );\n};\n`;
+  return `
+  export const ${name} = () => {
+  return (
+      ${generateJSX(tree)}
+    );
+  };
+`;
 }
 
 function isTextNode(node) {
@@ -213,8 +225,7 @@ function convertHTMLToStyledComponents(rootElement, reactComponentName) {
   // process root element
   const processedTree = processElement(rootElement);
 
-  let output = appendStyledComponents(components);
-  output += appendJsxComponent(reactComponentName, processedTree);
+  const output = `${appendStyledComponents(components)} ${appendJsxComponent(reactComponentName, processedTree)}`;
 
   return copyComponentTemplate(output);
 }
@@ -222,5 +233,4 @@ function convertHTMLToStyledComponents(rootElement, reactComponentName) {
 function copyComponentTemplate(innerComponents) {
   const fullComponent = templateComponent(innerComponents);
   copyToClipboard(fullComponent);
-  disablePicker();
 }
