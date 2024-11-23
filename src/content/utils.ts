@@ -122,7 +122,10 @@ function cleanBorderProperties(styleObject: object) {
   return cleanedObject;
 }
 
-function transformPsuedoSelectors(selectorObj: CSSRuleType) {
+function transformPsuedoSelectors(selectorObj: {
+  cssText: string;
+  selector: string;
+}) {
   const cleanedSelector = selectorObj.selector
     .split(',')
     .map((sel) => sel.replace(/^.*?(:hover|:focus)/, '$1'))

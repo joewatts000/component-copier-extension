@@ -2,20 +2,21 @@ const styles = `
 <style>
   #react-component-generator-popup {
     font-family: sans-serif;
-    font-size: 16px;
+    font-size: 15px;
     position: fixed; 
     top: 20px; 
     left: 20px; 
-    background: white; 
-    padding: 20px; 
-    border: 1px solid #ccc; 
+    background-color: #333; 
+    padding: 20px;  
     z-index: 10000;
     text-align: center;
+    --border-radius: 24px;
   }
 
   #react-component-generator-popup h3 {
     margin: 0 0 16px;
-    color: black;
+    font-weight: normal;
+    color: white;
   }
 
   #react-component-generator-popup form {
@@ -28,12 +29,17 @@ const styles = `
 
   #react-component-generator-popup input, #react-component-generator-popup select {
     background: white;
-    color: black;
-    padding: 8px;
+    color: #333;
+    padding: 10px 16px;
     font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    border: 1px solid #333;
+    border-radius: var(--border-radius);
     min-width: 280px;
+  }
+
+  .select-wrapper {
+    background-color: white;
+    border-radius: var(--border-radius);
   }
 
   #react-component-generator-popup select {
@@ -43,16 +49,24 @@ const styles = `
     -webkit-appearance: none !important; 
     appearance: none !important;
     padding-right: 2rem !important;
+    color: #333;
   }
 
   #react-component-generator-popup button {
     padding: 8px 16px;
     font-size: 16px;
-    border: 1px solid grey;
-    border-radius: 4px;
+    border-radius: var(--border-radius);
+    border: 1px solid #333;
     background-color: white;
-    color: black;
+    color: #333;
     cursor: pointer;
+    transition: all 0.2s ease-in-out;
+  }
+
+  #react-component-generator-popup button:hover {
+    background-color: #333;
+    color: white;
+    border-color: white;
   }
 </style>
 `;
@@ -62,10 +76,12 @@ const html = `
   <h3>Customize Component</h3>
   <form id="react-component-generator-form">
     <input type="text" id="component-name-input" placeholder="Enter Component Name" />
-    <select id="generated-type">
-      <option value="full">Full Component</option>
-      <option value="styled">Only Styled Components</option>
-    </select>
+    <div class="select-wrapper">
+      <select id="generated-type">
+        <option value="full">Full Component</option>
+        <option value="styled">Only Styled Components</option>
+      </select>
+    </div>
     <button type="submit">Generate Component</button>
   </form>
 </div>
