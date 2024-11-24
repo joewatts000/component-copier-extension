@@ -1,8 +1,5 @@
-import { controlChars, specialChars } from './constants';
-
-function kebabCase(str: string) {
-  return str.replace(/[A-Z]/g, (letter: string) => `-${letter.toLowerCase()}`);
-}
+import { specialChars } from './constants';
+import { capitalize, kebabCase, removeWeirdSpaces } from './strings';
 
 function cssObjectsToString(obj1: object, obj2?: object) {
   return (
@@ -16,22 +13,6 @@ function cssObjectsToString(obj1: object, obj2?: object) {
   );
 }
 
-const removeWeirdSpaces = (str: string) => {
-  if (typeof str !== 'string') {
-    return str;
-  }
-  try {
-    const controlCharRegex = new RegExp(
-      `[${controlChars.join('')}\u2000-\u200B]`,
-      'g'
-    );
-    return str.replace(controlCharRegex, '');
-  } catch (error) {
-    console.error('Error processing string:', error);
-    return str;
-  }
-};
-
 function replaceSpecialCharsWithHTMLEntities(str: string) {
   return removeWeirdSpaces(
     str.replace(
@@ -43,14 +24,6 @@ function replaceSpecialCharsWithHTMLEntities(str: string) {
 
 function splitCssRules(rule: { cssText: string }) {
   return rule.cssText.split('{')[1].split('}')[0];
-}
-
-function capitalize(str: string) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-function removeWhiteSpace(str: string) {
-  return str.replace(/\s/g, '');
 }
 
 function generateComponentName(element: HTMLElement) {
@@ -137,7 +110,7 @@ function transformPsuedoSelectors(selectorObj: {
   return cssRules ? `${cleanedSelector} { ${cssRules} }` : '';
 }
 
-function templateComponent(components) {
+function templateComponent(components: string) {
   return `/* eslint-disable import/no-unresolved */
   import styled from 'styled-components';
 
@@ -145,9 +118,24 @@ function templateComponent(components) {
   `;
 }
 
+function dedent(
+  strings: TemplateStringsArray,
+  ...values: readonly string[]
+): string {
+  const raw = String.raw({ raw: strings }, ...values);
+  const lines = raw.split('\n');
+  const firstNonEmptyLine = lines.find((line) => line.trim() !== '');
+
+  if (!firstNonEmptyLine) {
+    return raw;
+  }
+
+  const indentLength = firstNonEmptyLine.match(/^\s*/)?.[0].length ?? 0;
+  return lines.map((line) => line.slice(indentLength)).join('\n');
+}
+
 export {
   cssObjectsToString,
-  removeWhiteSpace,
   replaceSpecialCharsWithHTMLEntities,
   splitCssRules,
   capitalize,
@@ -160,4 +148,5 @@ export {
   transformPsuedoSelectors,
   cleanBorderProperties,
   templateComponent,
+  dedent,
 };

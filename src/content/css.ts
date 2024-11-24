@@ -4,8 +4,8 @@ import {
   CSSRuleType,
   splitCssRules,
   transformPsuedoSelectors,
-  kebabCase,
 } from './utils';
+import { kebabCase } from './strings';
 
 const PSEUDO_SELECTORS = [':hover', ':active', ':focus', ':visited'];
 
@@ -58,24 +58,26 @@ function templateStyles(
   cssArray: [string, string][],
   pseudoArray: CSSRuleType[]
 ): string {
+  const css =
+    cssArray
+      ?.map(([key, value]) => `  ${kebabCase(key)}: ${value};`)
+      .join('\n') || '';
+  const pseudo =
+    pseudoArray?.map((rule) => transformPsuedoSelectors(rule)).join('\n') || '';
+
   return `
-    ${cssArray.length > 0 ? '/*** from CSS rules ***/' : ''}
-    
-    ${cssArray
-      .map(([key, value]) => `  ${kebabCase(key)}: ${value};`)
-      .join('\n')}
-
-    ${pseudoArray.length > 0 ? '/*** alt states ***/' : ''}
-
-    ${pseudoArray.map((rule) => transformPsuedoSelectors(rule)).join('\n')}
+    ${css}
+  
+    ${pseudo}
   `;
 }
 
 export function getStyles(element: HTMLElement, cssRules: CSSRuleType[]) {
   const { relevantCSS, pseudoRules } = separateRules(cssRules, element);
   const uniqueRelevantCss = processCSS(relevantCSS);
+  const withoutZeroWidthBorders = cleanBorderProperties(uniqueRelevantCss);
   const withoutZeroWidthBordersArray = Object.entries(
-    cleanBorderProperties(uniqueRelevantCss)
+    withoutZeroWidthBorders
   ) as [string, string][];
 
   return templateStyles(withoutZeroWidthBordersArray, pseudoRules);

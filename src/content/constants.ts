@@ -57,3 +57,5 @@ export const ignoredHtmlAttributes = [
   'rel',
   'tabindex',
 ];
+
+export const POPUP_ID = 'react-component-generator-popup';

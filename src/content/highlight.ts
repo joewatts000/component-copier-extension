@@ -1,11 +1,7 @@
 import { holyTrinity } from './utils';
 
-function elementHighlight(e: MouseEvent, pickerActive: boolean) {
-  if (!pickerActive) {
-    return;
-  }
+function elementHighlight(e: MouseEvent) {
   holyTrinity(e);
-
   removeHighlight();
   const element = e.target as HTMLElement;
   element.dataset.previousOutline = element.style.outline;

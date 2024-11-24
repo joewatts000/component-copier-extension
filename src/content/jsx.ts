@@ -34,3 +34,13 @@ export function generateJSX(node: Node | null, depth = 1) {
 
   return `${indent}<${node.componentName} ${attributeString}>${childrenJSX ? '\n' + childrenJSX + '\n' + indent : ''}</${node.componentName}>`;
 }
+
+export function appendJsxComponent(name, tree) {
+  return `
+    export const ${name} = () => {
+      return (
+        ${generateJSX(tree)}
+      );
+    };
+  `;
+}

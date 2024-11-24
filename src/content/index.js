@@ -1,24 +1,23 @@
 import { insertPopupHtml } from './form';
+import { appendJsxComponent } from './jsx';
 import { elementHighlight, removeHighlight } from './highlight';
 import {
   holyTrinity,
   getAllCSSRules,
-  capitalize,
-  removeWhiteSpace,
   generateComponentName,
   copyToClipboard,
   templateComponent,
 } from './utils';
-import { generateJSX } from './jsx';
 import {
   appendStyledComponents,
   generateSimpleStyledComponent,
   generateStyledComponentName,
-} from './styled';
+} from './styledComponents';
 import { hidePopup, showPopup } from './popup';
 import { resetCursor, setupCursor } from './cursor';
 import { getStyles } from './css';
-import { ignoredHtmlAttributes } from './constants';
+import { isTextNode, isValidElement, processAttributes } from './html';
+import { capitalize, removeWhiteSpace } from './strings';
 
 let pickerActive = false;
 let pageCssRules;
@@ -28,12 +27,7 @@ chrome.runtime.onMessage.addListener(function (request) {
     return;
   }
   if (request.action === 'togglePicker') {
-    pickerActive = !pickerActive;
-    if (pickerActive) {
-      enablePicker();
-    } else {
-      disablePicker();
-    }
+    enablePicker();
   }
 });
 
@@ -45,35 +39,27 @@ function getAllPageCss() {
 }
 
 function enablePicker() {
+  if (pickerActive) {
+    return;
+  }
+  pickerActive = true;
   setupCursor();
   getAllPageCss();
   insertPopupHtml();
-  initializeFormElements();
   addPickerEventListeners();
 }
 
-function initializeFormElements() {
-
-
-}
-
 function addPickerEventListeners() {
-  console.log('addPickerEventListeners');
   document.addEventListener('click', elementPicker, { capture: true });
-  document.addEventListener(
-    'mouseover',
-    (e) => elementHighlight?.(e, pickerActive),
-    { capture: true }
-  );
+  document.addEventListener('mouseover', elementHighlight, { capture: true });
   document.addEventListener('mouseout', removeHighlight);
 }
 
 function removePickerEventListeners() {
-  console.log('removePickerEventListeners');
   document.removeEventListener('click', elementPicker, { capture: true });
-  document.removeEventListener('mouseover', (e) =>
-    elementHighlight(e, pickerActive)
-  );
+  document.removeEventListener('mouseover', elementHighlight, {
+    capture: true,
+  });
   document.removeEventListener('mouseout', removeHighlight);
 }
 
@@ -84,27 +70,33 @@ function disablePicker() {
   removeHighlight();
 }
 
+function formatNameInput(name) {
+  return capitalize(removeWhiteSpace(name));
+}
+
+function getComponentName(inputValue, element) {
+  if (inputValue) {
+    return formatNameInput(inputValue);
+  }
+  return `${generateComponentName(element)}Component`;
+}
+
 function elementPicker(e) {
   holyTrinity(e);
   disablePicker();
   showPopup();
 
-
-
   const element = e.target;
-
   const formElement = document.getElementById('react-component-generator-form');
-  const nameInput = document.getElementById('component-name-input');
 
   formElement.onsubmit = (event) => {
-    const selectElement = document.getElementById('generated-type');
     event.preventDefault();
-    const componentName = nameInput.value
-      ? capitalize(removeWhiteSpace(nameInput.value))
-      : `${generateComponentName(element)}Component`;
+    const selectElement = document.getElementById('generated-type');
+    const nameInput = document.getElementById('component-name-input');
+    const componentName = getComponentName(nameInput.value, element);
 
     if (selectElement.value === 'full') {
-      convertHTMLToStyledComponents(element, componentName);
+      convertHTMLToComponents(element, componentName);
     } else if (selectElement.value === 'styled') {
       generateSimpleStyledComponent(element, componentName, pageCssRules);
     }
@@ -113,27 +105,9 @@ function elementPicker(e) {
   };
 }
 
-function appendJsxComponent(name, tree) {
-  return `
-  export const ${name} = () => {
-  return (
-      ${generateJSX(tree)}
-    );
-  };
-`;
-}
-
-function isTextNode(node) {
-  return node.nodeType === 3;
-}
-
 function processTextNode(node) {
   const text = node.textContent.trim();
   return text ? { isText: true, textContent: text, children: [] } : null;
-}
-
-function isValidElement(element) {
-  return !!element.tagName;
 }
 
 function processChildNodes(childNodes, processElementFn) {
@@ -162,36 +136,15 @@ function processChildNodes(childNodes, processElementFn) {
   return processedChildren;
 }
 
-function processAttributes(element) {
-  return Array.from(element.attributes)
-    .filter((attribute) => !ignoredHtmlAttributes.includes(attribute.name))
-    .map((attribute) => {
-      // replace href with javascript:void(0) to prevent navigations
-      if (attribute.name === 'href') {
-        return {
-          name: 'href',
-          value: 'javascript:void(0)',
-        };
-      }
-      return attribute;
-    })
-    .reduce((acc, attribute) => {
-      acc[attribute.name] = attribute.value;
-      return acc;
-    }, {});
-}
-
-function convertHTMLToStyledComponents(rootElement, reactComponentName) {
+function convertHTMLToComponents(rootElement, reactComponentName) {
   let components = new Map();
   let componentCounter = new Map();
 
   function processElement(element) {
-    // text nodes
     if (isTextNode(element)) {
       return processTextNode(element);
     }
 
-    // non-element nodes
     if (!isValidElement(element)) {
       return null;
     }
@@ -209,7 +162,6 @@ function convertHTMLToStyledComponents(rootElement, reactComponentName) {
 
     const childNodes = Array.from(element.childNodes);
     const processedChildren = processChildNodes(childNodes, processElement);
-
     const attributes = processAttributes(element);
 
     return {
@@ -222,9 +174,7 @@ function convertHTMLToStyledComponents(rootElement, reactComponentName) {
     };
   }
 
-  // process root element
   const processedTree = processElement(rootElement);
-
   const output = `${appendStyledComponents(components)} ${appendJsxComponent(reactComponentName, processedTree)}`;
 
   return copyComponentTemplate(output);

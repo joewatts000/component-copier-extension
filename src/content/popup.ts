@@ -1,7 +1,8 @@
+import { POPUP_ID } from './constants';
+import { resetCursor } from './cursor';
+
 function showPopup() {
-  const popup: HTMLElement | null = document.getElementById(
-    'react-component-generator-popup'
-  );
+  const popup: HTMLElement | null = document.getElementById(POPUP_ID);
   if (!popup) {
     return;
   }
@@ -16,12 +17,12 @@ function showPopup() {
 }
 
 function hidePopup() {
-  const popup = document.getElementById('react-component-generator-popup');
+  const popup: HTMLElement | null = document.getElementById(POPUP_ID);
   if (!popup) {
     return;
   }
   popup.style.display = 'none';
-  document.body.style.cursor = 'default';
+  resetCursor();
 }
 
 export { showPopup, hidePopup };
