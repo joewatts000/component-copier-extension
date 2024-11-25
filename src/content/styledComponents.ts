@@ -28,9 +28,8 @@ export function generateStyledComponent(
   styles: StyleObject | string,
   elementType: string
 ) {
-  const nonWebComponent = webComponentToDiv(elementType);
   return `
-    const ${componentName} = styled.${nonWebComponent}\`
+    const ${componentName} = styled.${webComponentToDiv(elementType)}\`
       ${styles}
     \`;
   `;

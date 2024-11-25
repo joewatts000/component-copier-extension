@@ -1,4 +1,5 @@
 import { specialChars } from './constants';
+import { cssPropertiesToPixels } from './css';
 import { niceNameForTag } from './html';
 import { capitalize, kebabCase, removeWeirdSpaces } from './strings';
 
@@ -39,31 +40,6 @@ function holyTrinity(e: MouseEvent) {
   e.preventDefault();
   e.stopPropagation();
   e.stopImmediatePropagation();
-}
-
-export type CSSRuleType = {
-  selector: string;
-  cssText: string;
-};
-
-function getAllCSSRules() {
-  const rules: CSSRuleType[] = [];
-  for (const stylesheet of document.styleSheets) {
-    try {
-      for (const rule of stylesheet.cssRules) {
-        if (rule.type === CSSRule.STYLE_RULE) {
-          rules.push({
-            // @ts-ignore
-            selector: rule.selectorText,
-            cssText: rule.cssText,
-          });
-        }
-      }
-    } catch {
-      console.log('Stylesheet access error');
-    }
-  }
-  return rules;
 }
 
 function isZeroWidth(value: string) {
@@ -107,7 +83,20 @@ function transformPsuedoSelectors(selectorObj: {
   const match = selectorObj.cssText.match(/\{(.+)\}/);
   const cssRules = match ? match[1].trim() : '';
 
-  return cssRules ? `${cleanedSelector} { ${cssRules} }` : '';
+  // cssRules to array or strings, e.g.: text-decoration: none; background-color: var(--bgColor-muted, var(--color-canvas-subtle)); => [['text-decoration', 'none'], ['background-color', 'var(--bgColor-muted, var(--color-canvas-subtle))']]
+  const cssRulesArray = cssRules
+    .split(';')
+    .map((rule) => rule.trim())
+    .map((rule) => rule.split(':'))
+    .map((rule) => rule.map((str) => str.trim()))
+    .filter((rule) => rule[0] !== '') as [string, string][];
+
+  // resolve css variables
+  const resolvedCssRulesArray = cssPropertiesToPixels(cssRulesArray)
+    .map((rule) => rule.join(': '))
+    .join(';\n');
+
+  return cssRules ? `${cleanedSelector} { ${resolvedCssRulesArray}; }` : '';
 }
 
 function templateComponent(components: string) {
@@ -143,7 +132,6 @@ export {
   generateComponentName,
   copyToClipboard,
   holyTrinity,
-  getAllCSSRules,
   isZeroWidthValue,
   transformPsuedoSelectors,
   cleanBorderProperties,

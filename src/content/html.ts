@@ -75,6 +75,9 @@ export function niceNameForTag(tagName: string) {
   if (tagName === 'DIV') {
     return 'Box';
   }
+  if (tagName === 'NAV') {
+    return 'Navigation';
+  }
 
   const lower = tagName.toLowerCase();
   const camel = kebabToCamel(lower); // for web components

@@ -3,7 +3,6 @@ import { appendJsxComponent } from './jsx';
 import { elementHighlight, removeHighlight } from './highlight';
 import {
   holyTrinity,
-  getAllCSSRules,
   generateComponentName,
   copyToClipboard,
   templateComponent,
@@ -15,7 +14,7 @@ import {
 } from './styledComponents';
 import { hidePopup, showPopup } from './popup';
 import { resetCursor, setupCursor } from './cursor';
-import { getStyles } from './css';
+import { getAllCSSRules, getStyles } from './css';
 import { isTextNode, isValidElement, processAttributes } from './html';
 import { capitalize, removeWhiteSpace } from './strings';
 
@@ -136,7 +135,7 @@ function processChildNodes(childNodes, processElementFn) {
   return processedChildren;
 }
 
-function convertHTMLToComponents(rootElement, reactComponentName) {
+function convertHTMLToComponents(rootElement, rootComponentName) {
   let components = new Map();
   let componentCounter = new Map();
 
@@ -153,6 +152,7 @@ function convertHTMLToComponents(rootElement, reactComponentName) {
       element.tagName,
       componentCounter
     );
+
     const styles = getStyles(element, pageCssRules);
 
     components.set(componentName, {
@@ -175,7 +175,10 @@ function convertHTMLToComponents(rootElement, reactComponentName) {
   }
 
   const processedTree = processElement(rootElement);
-  const output = `${appendStyledComponents(components)} ${appendJsxComponent(reactComponentName, processedTree)}`;
+  const output = `
+    ${appendStyledComponents(components)}
+    ${appendJsxComponent(rootComponentName, processedTree)}
+  `;
 
   return copyComponentTemplate(output);
 }
