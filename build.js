@@ -8,14 +8,14 @@ async function build() {
     entrypoints: ['./src/content/index.js'],
     outdir: './dist',
     naming: 'content.js',
-    minify: true,
+    // minify: true,
   });
 
   await Bun.build({
     entrypoints: ['./src/background/index.js'],
     outdir: './dist',
     naming: 'background.js',
-    minify: true,
+    // minify: true,
   });
 
   await Bun.write(

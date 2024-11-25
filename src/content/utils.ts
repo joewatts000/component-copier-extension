@@ -75,10 +75,15 @@ function transformPsuedoSelectors(selectorObj: {
   cssText: string;
   selector: string;
 }) {
-  const cleanedSelector = selectorObj.selector
+  const cleanedSelectors = selectorObj.selector
     .split(',')
-    .map((sel) => sel.replace(/^.*?(:hover|:focus)/, '$1'))
-    .join(',');
+    .map((sel) => sel.replace(/^.*?(:hover|:focus)/, '$1'));
+
+  // create a unique array of selectors
+  const uniqueSelectors = [...new Set(cleanedSelectors)];
+
+  // join the unique selectors with a comma
+  const joinedSelectors = uniqueSelectors.join(',');
 
   const match = selectorObj.cssText.match(/\{(.+)\}/);
   const cssRules = match ? match[1].trim() : '';
@@ -96,7 +101,7 @@ function transformPsuedoSelectors(selectorObj: {
     .map((rule) => rule.join(': '))
     .join(';\n');
 
-  return cssRules ? `${cleanedSelector} { ${resolvedCssRulesArray}; }` : '';
+  return cssRules ? `${joinedSelectors} { ${resolvedCssRulesArray}; }` : '';
 }
 
 function templateComponent(components: string) {

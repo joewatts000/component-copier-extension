@@ -24,7 +24,7 @@ export const specialChars = {
 
 export const ignoredHtmlAttributes = [
   'class',
-  'style',
+  // 'style',
   'data-previous-outline',
   'id',
   'target',

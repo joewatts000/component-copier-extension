@@ -1,6 +1,40 @@
-var R=[String.fromCharCode(11),String.fromCharCode(12),String.fromCharCode(160),String.fromCharCode(133),String.fromCharCode(5760),String.fromCharCode(6158),String.fromCharCode(65279),String.fromCharCode(8232),String.fromCharCode(8233),String.fromCharCode(8239),String.fromCharCode(8287),String.fromCharCode(12288)],T={"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;","\xB4":"&acute;"},M=["class","style","data-previous-outline","id","target","rel","tabindex"],c="react-component-generator-popup";var io=`
+// src/content/constants.ts
+var controlChars = [
+  String.fromCharCode(11),
+  String.fromCharCode(12),
+  String.fromCharCode(160),
+  String.fromCharCode(133),
+  String.fromCharCode(5760),
+  String.fromCharCode(6158),
+  String.fromCharCode(65279),
+  String.fromCharCode(8232),
+  String.fromCharCode(8233),
+  String.fromCharCode(8239),
+  String.fromCharCode(8287),
+  String.fromCharCode(12288)
+];
+var specialChars = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': "&quot;",
+  "'": "&#039;",
+  "\xB4": "&acute;"
+};
+var ignoredHtmlAttributes = [
+  "class",
+  "data-previous-outline",
+  "id",
+  "target",
+  "rel",
+  "tabindex"
+];
+var POPUP_ID = "react-component-generator-popup";
+
+// src/content/form.ts
+var styles = `
   <style>
-    #${c} {
+    #${POPUP_ID} {
       font-family: sans-serif;
       font-size: 15px;
       position: fixed; 
@@ -13,13 +47,13 @@ var R=[String.fromCharCode(11),String.fromCharCode(12),String.fromCharCode(160),
       --border-radius: 24px;
     }
 
-    #${c} h3 {
+    #${POPUP_ID} h3 {
       margin: 0 0 16px;
       font-weight: normal;
       color: white;
     }
 
-    #${c} form {
+    #${POPUP_ID} form {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -27,7 +61,7 @@ var R=[String.fromCharCode(11),String.fromCharCode(12),String.fromCharCode(160),
       gap: 16px;
     }
 
-    #${c} input, #${c} select {
+    #${POPUP_ID} input, #${POPUP_ID} select {
       background: white;
       color: #333;
       padding: 10px 16px;
@@ -42,7 +76,7 @@ var R=[String.fromCharCode(11),String.fromCharCode(12),String.fromCharCode(160),
       border-radius: var(--border-radius);
     }
 
-    #${c} select {
+    #${POPUP_ID} select {
       background: url("data:image/svg+xml,<svg height='10px' width='10px' viewBox='0 0 16 16' fill='%23000000' xmlns='http://www.w3.org/2000/svg'><path d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/></svg>") no-repeat;
       background-position: calc(100% - 0.75rem) center !important;
       -moz-appearance:none !important;
@@ -52,7 +86,7 @@ var R=[String.fromCharCode(11),String.fromCharCode(12),String.fromCharCode(160),
       color: #333;
     }
 
-    #${c} button {
+    #${POPUP_ID} button {
       padding: 8px 16px;
       font-size: 16px;
       border-radius: var(--border-radius);
@@ -63,14 +97,15 @@ var R=[String.fromCharCode(11),String.fromCharCode(12),String.fromCharCode(160),
       transition: all 0.2s ease-in-out;
     }
 
-    #${c} button:hover {
+    #${POPUP_ID} button:hover {
       background-color: #333;
       color: white;
       border-color: white;
     }
   </style>
-`,so=`
-  <div id="${c}" style="display:none;">
+`;
+var html = `
+  <div id="${POPUP_ID}" style="display:none;">
     <h3>Customize Component</h3>
     <form id="react-component-generator-form">
       <input type="text" id="component-name-input" placeholder="Enter Component Name" />
@@ -83,30 +118,545 @@ var R=[String.fromCharCode(11),String.fromCharCode(12),String.fromCharCode(160),
       <button type="submit">Generate Component</button>
     </form>
   </div>
-`;function po(){return`${io}${so}`}function L(){document.body.insertAdjacentHTML("beforeend",po())}var H=(o)=>o.trim(),I=(o)=>o.replace(/!important/g,""),b=(o)=>o!=="",m=(o)=>o.charAt(0).toUpperCase()+o.slice(1),z=(o)=>o.replace(/\s/g,""),v=(o)=>o.replace(/[A-Z]/g,(t)=>`-${t.toLowerCase()}`),A=(o)=>o.replace(/-([a-z])/g,(t,e)=>e.toUpperCase()),B=(o)=>{if(typeof o!=="string")return o;try{let t=new RegExp(`[${R.join("")}\u2000-\u200B]`,"g");return o.replace(t,"")}catch(t){return console.error("Error processing string:",t),o}},D=(o)=>{let t=0;return[...o].filter((n)=>{if(n==="(")return t++,!0;else if(n===")"){if(t>0)return t--,!0;return!1}return!0}).join("")};function co(o,t){let n=getComputedStyle(document.documentElement).getPropertyValue(o.trim());if(n)return n.trim();return t??null}function _(o){let[t,e]=o;while(e.includes("var(")){let i=e.indexOf("var("),s=e.indexOf(")",i),p=e.slice(i+4,s),[u,h]=p.includes(",")?p.split(",").map((a)=>a.trim()):[p.trim(),void 0],l=co(u,h);if(l===null)return console.error(`CSS variable ${u} could not be resolved.`),o;e=e.slice(0,i)+l+e.slice(s+1)}let n=e.replace(/^\s+|\s+$/g,""),r=D(n);return[t,r]}var uo=[":hover",":active",":focus",":visited"];function mo(o){return uo.some((t)=>o.includes(t))}function fo(o,t){let e=[],n=[];return o.forEach((r)=>{let i=t.matches(r.selector),s=mo(r.selector);if(i&&s)n.push(r);else if(i)e.push(r)}),{relevantCSS:e,pseudoRules:n}}function lo(o){let t=o.map(q).join("\n");return Array.from(new Set(t.split(";"))).map(H).map(I).filter(b).reduce((e,n)=>{let[r,i]=n.split(":");return e[r]=i,e},{})}function Co(o,t){let e=o?.map(([r,i])=>`  ${v(r)}: ${i};`).join("\n")||"",n=t?.map((r)=>F(r)).join("\n")||"";return`
-    ${e}
+`;
+function getPopupHtml() {
+  return `${styles}${html}`;
+}
+function insertPopupHtml() {
+  document.body.insertAdjacentHTML("beforeend", getPopupHtml());
+}
+
+// src/content/strings.ts
+var trim = (s) => s.trim();
+var replaceImportant = (s) => s.replace(/!important/g, "");
+var replaceEmpty = (s) => s !== "";
+var capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+var removeWhiteSpace = (str) => str.replace(/\s/g, "");
+var kebabCase = (str) => str.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+var kebabToCamel = (str) => str.replace(/-([a-z])/g, (_, char) => char.toUpperCase());
+var removeWeirdSpaces = (str) => {
+  if (typeof str !== "string") {
+    return str;
+  }
+  try {
+    const controlCharRegex = new RegExp(`[${controlChars.join("")}\u2000-\u200B]`, "g");
+    return str.replace(controlCharRegex, "");
+  } catch (error) {
+    console.error("Error processing string:", error);
+    return str;
+  }
+};
+var removeExtraParentheses = (input) => {
+  let openBrackets = 0;
+  const result = [...input].filter((char) => {
+    if (char === "(") {
+      openBrackets++;
+      return true;
+    } else if (char === ")") {
+      if (openBrackets > 0) {
+        openBrackets--;
+        return true;
+      }
+      return false;
+    }
+    return true;
+  });
+  return result.join("");
+};
+
+// src/content/resolveCssVariables.ts
+function resolveCssVariable(variable, fallback) {
+  const computedStyle = getComputedStyle(document.documentElement);
+  const value = computedStyle.getPropertyValue(variable.trim());
+  if (value) {
+    return value.trim();
+  }
+  return fallback ?? null;
+}
+function resolveCssVariables(style) {
+  let [propertyName, propertyValue] = style;
+  while (propertyValue.includes("var(")) {
+    const startIdx = propertyValue.indexOf("var(");
+    const endIdx = propertyValue.indexOf(")", startIdx);
+    const varContent = propertyValue.slice(startIdx + 4, endIdx);
+    const [varName, fallback] = varContent.includes(",") ? varContent.split(",").map((str) => str.trim()) : [varContent.trim(), undefined];
+    const resolvedValue = resolveCssVariable(varName, fallback);
+    if (resolvedValue === null) {
+      console.error(`CSS variable ${varName} could not be resolved.`);
+      return style;
+    }
+    propertyValue = propertyValue.slice(0, startIdx) + resolvedValue + propertyValue.slice(endIdx + 1);
+  }
+  const trimmed = propertyValue.replace(/^\s+|\s+$/g, "");
+  const cleanedValue = removeExtraParentheses(trimmed);
+  return [propertyName, cleanedValue];
+}
+
+// src/content/templateComputedStyles.ts
+function templateComputedStyles(element) {
+  const computedStyles = getComputedStyle(element);
+  const relevantComputedStyleProperties = [
+    "margin",
+    "padding",
+    "color",
+    "background-color",
+    "font-size",
+    "font-family",
+    "font-weight",
+    "line-height",
+    "border",
+    "border-radius",
+    "display",
+    "flex-direction",
+    "justify-content",
+    "align-items",
+    "position",
+    "top",
+    "right",
+    "bottom",
+    "left",
+    "z-index",
+    "flex",
+    "grid",
+    "transform"
+  ];
+  const relevantComputedStyleValues = relevantComputedStyleProperties.map((property) => computedStyles.getPropertyValue(property)).filter((value) => {
+    return value !== "" && value !== "initial";
+  });
+  return `
+    /* css file not accessible, using computed styles instead */
+    ${relevantComputedStyleProperties.map((property, index) => `${property}: ${relevantComputedStyleValues[index]};`).join("\n")}
+  `;
+}
+
+// src/content/css.ts
+var PSEUDO_SELECTORS = [":hover", ":active", ":focus", ":visited"];
+function isPseudoRule(testSelector) {
+  return PSEUDO_SELECTORS.some((selector) => testSelector.includes(selector));
+}
+function separateRules(cssRules, element) {
+  const relevantCSS = [];
+  const pseudoRules = [];
+  cssRules.forEach((rule) => {
+    const hasMatch = element.matches(rule.selector);
+    const isPseudo = isPseudoRule(rule.selector);
+    if (hasMatch && isPseudo) {
+      pseudoRules.push(rule);
+    } else if (hasMatch) {
+      relevantCSS.push(rule);
+    }
+  });
+  return { relevantCSS, pseudoRules };
+}
+function processCSS(css) {
+  const cssStyle = css.map(splitCssRules).join("\n");
+  return Array.from(new Set(cssStyle.split(";"))).map(trim).map(replaceImportant).filter(replaceEmpty).reduce((acc, rule) => {
+    const [property, value] = rule.split(":");
+    acc[property] = value;
+    return acc;
+  }, {});
+}
+function templateStyles(cssArray, pseudoArray) {
+  const css = cssArray?.map(([key, value]) => `  ${kebabCase(key)}: ${value};`).join("\n") || "";
+  const pseudo = [
+    ...new Set(pseudoArray?.map((rule) => transformPsuedoSelectors(rule)))
+  ]?.join("\n") || "";
+  return `
+    ${css}
   
-    ${n}
-  `}var E=(o)=>o.map(_);function d(o,t){let{relevantCSS:e,pseudoRules:n}=fo(t,o),r=k(lo(e)),i=E(Object.entries(r));return Co(i,n)}function U(){let o=[];for(let t of document.styleSheets)try{for(let e of t.cssRules)if(e instanceof CSSStyleRule)o.push({selector:e.selectorText,cssText:e.cssText})}catch{console.warn("Stylesheet access error")}return o}function P(o){return o.nodeType===3}function G(o){return!!o.tagName}function O(o){return Array.from(o.attributes).filter((t)=>!M.includes(t.name)).map((t)=>{if(t.name==="href")return{name:"href",value:"javascript:void(0)"};return t}).reduce((t,e)=>{return t[e.name]=e.value,t},{})}function C(o){if(o==="IMG")return"Image";if(o==="A")return"Anchor";if(o==="P")return"Text";if(o==="H1")return"Heading";if(o==="H2")return"Subheading";if(o==="H3")return"Subheading3";if(o==="H4")return"Subheading4";if(o==="H5")return"Subheading5";if(o==="H6")return"Subheading6";if(o==="UL")return"UnorderedList";if(o==="OL")return"OrderedList";if(o==="LI")return"ListItem";if(o==="DIV")return"Box";if(o==="NAV")return"Navigation";let t=o.toLowerCase(),e=A(t);return m(e)}function Q(o){if(o.includes("-"))return"div";return o}function Y(o){return B(o.replace(new RegExp(`[${Object.keys(T).join("")}]`,"g"),(t)=>T[t]))}function q(o){return o.cssText.split("{")[1].split("}")[0]}function Z(o){return C(o.tagName)}function g(o){navigator.clipboard.writeText(o)}function S(o){o.preventDefault(),o.stopPropagation(),o.stopImmediatePropagation()}function k(o){let t={...o};if(t["border-width"]==="0"||t["border-width"]===0||t["border-width"]==="0px")Object.keys(t).filter((e)=>e.startsWith("border-")).forEach((e)=>delete t[e]);return t}function F(o){let t=o.selector.split(",").map((s)=>s.replace(/^.*?(:hover|:focus)/,"$1")).join(","),e=o.cssText.match(/\{(.+)\}/),n=e?e[1].trim():"",r=n.split(";").map((s)=>s.trim()).map((s)=>s.split(":")).map((s)=>s.map((p)=>p.trim())).filter((s)=>s[0]!==""),i=E(r).map((s)=>s.join(": ")).join(";\n");return n?`${t} { ${i}; }`:""}function K(o){return`/* eslint-disable import/no-unresolved */
+    ${pseudo}
+  `;
+}
+var cssPropertiesToPixels = (array) => array.map(resolveCssVariables);
+function getStyles(element, cssRules) {
+  if (cssRules.length === 0) {
+    return templateComputedStyles(element);
+  }
+  const { relevantCSS, pseudoRules } = separateRules(cssRules, element);
+  const uniqueRelevantCss = cleanBorderProperties(processCSS(relevantCSS));
+  const resolvedCss = cssPropertiesToPixels(Object.entries(uniqueRelevantCss));
+  return templateStyles(resolvedCss, pseudoRules);
+}
+function getAllCSSRules() {
+  const rules = [];
+  for (const stylesheet of document.styleSheets) {
+    try {
+      for (const rule of stylesheet.cssRules) {
+        if (rule instanceof CSSStyleRule) {
+          rules.push({
+            selector: rule.selectorText,
+            cssText: rule.cssText
+          });
+        }
+      }
+    } catch {
+      console.warn("! -------- Stylesheet access error -------- !");
+      return [];
+    }
+  }
+  return rules;
+}
+
+// src/content/html.ts
+function isTextNode(node) {
+  return node.nodeType === 3;
+}
+function isValidElement(element) {
+  return !!element.tagName;
+}
+function processAttributes(element) {
+  return Array.from(element.attributes).filter((attribute) => attribute.value).filter((attribute) => !ignoredHtmlAttributes.includes(attribute.name)).map((attribute) => {
+    if (attribute.name === "href") {
+      return {
+        name: "href",
+        value: "javascript:void(0)"
+      };
+    }
+    return attribute;
+  }).reduce((acc, attribute) => {
+    acc[attribute.name] = attribute.value;
+    return acc;
+  }, {});
+}
+function niceNameForTag(tagName) {
+  if (tagName === "IMG") {
+    return "Image";
+  }
+  if (tagName === "A") {
+    return "Anchor";
+  }
+  if (tagName === "P") {
+    return "Text";
+  }
+  if (tagName === "H1") {
+    return "Heading";
+  }
+  if (tagName === "H2") {
+    return "Subheading";
+  }
+  if (tagName === "H3") {
+    return "Subheading3";
+  }
+  if (tagName === "H4") {
+    return "Subheading4";
+  }
+  if (tagName === "H5") {
+    return "Subheading5";
+  }
+  if (tagName === "H6") {
+    return "Subheading6";
+  }
+  if (tagName === "UL") {
+    return "UnorderedList";
+  }
+  if (tagName === "OL") {
+    return "OrderedList";
+  }
+  if (tagName === "LI") {
+    return "ListItem";
+  }
+  if (tagName === "DIV") {
+    return "Box";
+  }
+  if (tagName === "NAV") {
+    return "Navigation";
+  }
+  if (tagName === "g") {
+    return "Group";
+  }
+  const lower = tagName.toLowerCase();
+  const camel = kebabToCamel(lower);
+  return capitalize(camel);
+}
+function webComponentToDiv(elementType) {
+  if (elementType.includes("-")) {
+    return "div";
+  }
+  return elementType;
+}
+
+// src/content/utils.ts
+function replaceSpecialCharsWithHTMLEntities(str) {
+  return removeWeirdSpaces(str.replace(new RegExp(`[${Object.keys(specialChars).join("")}]`, "g"), (char) => specialChars[char]));
+}
+function splitCssRules(rule) {
+  return rule.cssText.split("{")[1].split("}")[0];
+}
+function generateComponentName(element) {
+  return niceNameForTag(element.tagName);
+}
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text);
+}
+function holyTrinity(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  e.stopImmediatePropagation();
+}
+function cleanBorderProperties(styleObject) {
+  const cleanedObject = { ...styleObject };
+  if (cleanedObject["border-width"] === "0" || cleanedObject["border-width"] === 0 || cleanedObject["border-width"] === "0px") {
+    Object.keys(cleanedObject).filter((key) => key.startsWith("border-")).forEach((key) => delete cleanedObject[key]);
+  }
+  return cleanedObject;
+}
+function transformPsuedoSelectors(selectorObj) {
+  const cleanedSelectors = selectorObj.selector.split(",").map((sel) => sel.replace(/^.*?(:hover|:focus)/, "$1"));
+  const uniqueSelectors = [...new Set(cleanedSelectors)];
+  const joinedSelectors = uniqueSelectors.join(",");
+  const match = selectorObj.cssText.match(/\{(.+)\}/);
+  const cssRules = match ? match[1].trim() : "";
+  const cssRulesArray = cssRules.split(";").map((rule) => rule.trim()).map((rule) => rule.split(":")).map((rule) => rule.map((str) => str.trim())).filter((rule) => rule[0] !== "");
+  const resolvedCssRulesArray = cssPropertiesToPixels(cssRulesArray).map((rule) => rule.join(": ")).join(";\n");
+  return cssRules ? `${joinedSelectors} { ${resolvedCssRulesArray}; }` : "";
+}
+function templateComponent(components) {
+  return `/* eslint-disable import/no-unresolved */
   import styled from 'styled-components';
 
-  ${o}
-  `}function J(o,t=1){if(!o)return"";let e="  ".repeat(t);if(o.isText)return`${e}${Y(o.textContent)}`;let n=o.children.map((i)=>J(i,t+1)).filter(Boolean).join("\n"),r=o.attributes?Object.entries(o.attributes).map(([i,s])=>`${i}="${s}"`).join(" "):"";if(!n)return`${e}<${o.componentName} ${r} />`;return`${e}<${o.componentName} ${r}>${n?"\n"+n+"\n"+e:""}</${o.componentName}>`}function W(o,t){return`
-    export const ${o} = () => {
+  ${components}
+  `;
+}
+
+// src/content/jsx.ts
+function generateJSX(node, depth = 1) {
+  if (!node)
+    return "";
+  const indent = "  ".repeat(depth);
+  if (node.isText) {
+    return `${indent}${replaceSpecialCharsWithHTMLEntities(node.textContent)}`;
+  }
+  const childrenJSX = node.children.map((child) => generateJSX(child, depth + 1)).filter(Boolean).join("\n");
+  const attributeString = node.attributes ? Object.entries(node.attributes).map(([key, value]) => `${key}="${value}"`).join(" ") : "";
+  if (!childrenJSX) {
+    return `${indent}<${node.componentName} ${attributeString} />`;
+  }
+  return `${indent}<${node.componentName} ${attributeString}>${childrenJSX ? "\n" + childrenJSX + "\n" + indent : ""}</${node.componentName}>`;
+}
+function appendJsxComponent(name, tree) {
+  return `
+    export const ${name} = () => {
       return (
-        ${J(t)}
+        ${generateJSX(tree)}
       );
     };
-  `}function $(o){S(o),f();let t=o.target;t.dataset.previousOutline=t.style.outline,t.style.outline="2px solid #ff0000"}function f(){let o=document.querySelector("[data-previous-outline]");if(o)o.style.outline=o.dataset.previousOutline||"",delete o.dataset.previousOutline}function X(o,t,e){let n=d(o,e),r=o.tagName.toLowerCase(),s=`
+  `;
+}
+
+// src/content/highlight.ts
+function elementHighlight(e) {
+  holyTrinity(e);
+  removeHighlight();
+  const element = e.target;
+  element.dataset.previousOutline = element.style.outline;
+  element.style.outline = "2px solid #ff0000";
+}
+function removeHighlight() {
+  const highlighted = document.querySelector("[data-previous-outline]");
+  if (highlighted) {
+    highlighted.style.outline = highlighted.dataset.previousOutline || "";
+    delete highlighted.dataset.previousOutline;
+  }
+}
+
+// src/content/styledComponents.ts
+function generateSimpleStyledComponent(element, componentName, pageCssRules) {
+  const styles2 = getStyles(element, pageCssRules);
+  const elementType = element.tagName.toLowerCase();
+  const styledComponentCode = generateStyledComponent(componentName, styles2, elementType);
+  const final = `
     /* eslint-disable import/no-unresolved */
     import styled from 'styled-components';
-    ${j(t,n,r)}
-    export { ${t} };
-  `;g(s)}function j(o,t,e){return`
-    const ${o} = styled.${Q(e)}\`
-      ${t}
+    ${styledComponentCode}
+    export { ${componentName} };
+  `;
+  copyToClipboard(final);
+}
+function generateStyledComponent(componentName, styles2, elementType) {
+  return `
+    const ${componentName} = styled.${webComponentToDiv(elementType)}\`
+      ${styles2}
     \`;
-  `}function V(o,t){let e=C(o),n=t.get(e)||0;if(t.set(e,n+1),n===0)return e;return`${e}_${n}`}function N(o){return Array.from(o).map(([t,{tag:e,styles:n}])=>j(t,n,e)).join("")}function oo(){document.body.style.cursor="crosshair"}function x(){document.body.style.cursor="default"}function to(){let o=document.getElementById(c);if(!o)return;o.style.display="block";let t=document.getElementById("component-name-input");if(!t)return;t.focus()}function eo(){let o=document.getElementById(c);if(!o)return;o.style.display="none",x()}var w=!1,y;chrome.runtime.onMessage.addListener(function(o){if(document.readyState!=="complete")return;if(o.action==="togglePicker")So()});function go(){if(!y)y=U()}function So(){if(w)return;w=!0,oo(),go(),L(),xo()}function xo(){document.addEventListener("click",no,{capture:!0}),document.addEventListener("mouseover",$,{capture:!0}),document.addEventListener("mouseout",f)}function yo(){document.removeEventListener("click",no,{capture:!0}),document.removeEventListener("mouseover",$,{capture:!0}),document.removeEventListener("mouseout",f)}function ho(){w=!1,x(),yo(),f()}function ao(o){return m(z(o))}function To(o,t){if(o)return ao(o);return`${Z(t)}Component`}function no(o){S(o),ho(),to();let t=o.target,e=document.getElementById("react-component-generator-form");e.onsubmit=(n)=>{n.preventDefault();let r=document.getElementById("generated-type"),i=document.getElementById("component-name-input"),s=To(i.value,t);if(r.value==="full")Po(t,s);else if(r.value==="styled")X(t,s,y);eo()}}function vo(o){let t=o.textContent.trim();return t?{isText:!0,textContent:t,children:[]}:null}function Eo(o,t){let e=[],n=!1;for(let r of o)if(P(r)){let i=r.textContent.trim();if(i&&!n)e.push({isText:!0,textContent:i,children:[]}),n=!0}else{let i=t(r);if(i)e.push(i)}return e}function Po(o,t){let e=new Map,n=new Map;function r(p){if(P(p))return vo(p);if(!G(p))return null;let u=V(p.tagName,n),h=d(p,y);e.set(u,{tag:p.tagName.toLowerCase(),styles:h});let l=Array.from(p.childNodes),a=Eo(l,r),ro=O(p);return{componentName:u,children:a,textContent:"",isText:!1,viewBox:p.viewBox,attributes:ro}}let i=r(o),s=`
-    ${N(e)}
-    ${W(t,i)}
-  `;return $o(s)}function $o(o){let t=K(o);g(t)}
+  `;
+}
+function generateStyledComponentName(tagName, componentCounter) {
+  const niceName = niceNameForTag(tagName);
+  const count = componentCounter.get(niceName) || 0;
+  componentCounter.set(niceName, count + 1);
+  if (count === 0) {
+    return niceName;
+  }
+  return `${niceName}_${count}`;
+}
+function appendStyledComponents(components) {
+  return Array.from(components).map(([name, { tag, styles: styles2 }]) => generateStyledComponent(name, styles2, tag)).join("");
+}
+
+// src/content/cursor.ts
+function setupCursor() {
+  document.body.style.cursor = "crosshair";
+}
+function resetCursor() {
+  document.body.style.cursor = "default";
+}
+
+// src/content/popup.ts
+function showPopup() {
+  const popup = document.getElementById(POPUP_ID);
+  if (!popup) {
+    return;
+  }
+  popup.style.display = "block";
+  const nameInput = document.getElementById("component-name-input");
+  if (!nameInput) {
+    return;
+  }
+  nameInput.focus();
+}
+function hidePopup() {
+  const popup = document.getElementById(POPUP_ID);
+  if (!popup) {
+    return;
+  }
+  popup.style.display = "none";
+  resetCursor();
+}
+
+// src/content/index.js
+var pickerActive = false;
+var pageCssRules;
+chrome.runtime.onMessage.addListener(function(request) {
+  if (document.readyState !== "complete") {
+    return;
+  }
+  if (request.action === "togglePicker") {
+    enablePicker();
+  }
+});
+function getAllPageCss() {
+  if (!pageCssRules) {
+    pageCssRules = getAllCSSRules();
+  }
+}
+function enablePicker() {
+  if (pickerActive) {
+    return;
+  }
+  pickerActive = true;
+  setupCursor();
+  getAllPageCss();
+  insertPopupHtml();
+  addPickerEventListeners();
+}
+function addPickerEventListeners() {
+  document.addEventListener("click", elementPicker, { capture: true });
+  document.addEventListener("mouseover", elementHighlight, { capture: true });
+  document.addEventListener("mouseout", removeHighlight);
+}
+function removePickerEventListeners() {
+  document.removeEventListener("click", elementPicker, { capture: true });
+  document.removeEventListener("mouseover", elementHighlight, {
+    capture: true
+  });
+  document.removeEventListener("mouseout", removeHighlight);
+}
+function disablePicker() {
+  pickerActive = false;
+  resetCursor();
+  removePickerEventListeners();
+  removeHighlight();
+}
+function formatNameInput(name) {
+  return capitalize(removeWhiteSpace(name));
+}
+function getComponentName(inputValue, element) {
+  if (inputValue) {
+    return formatNameInput(inputValue);
+  }
+  return `${generateComponentName(element)}Component`;
+}
+function elementPicker(e) {
+  holyTrinity(e);
+  disablePicker();
+  showPopup();
+  const element = e.target;
+  const formElement = document.getElementById("react-component-generator-form");
+  formElement.onsubmit = (event) => {
+    event.preventDefault();
+    const selectElement = document.getElementById("generated-type");
+    const nameInput = document.getElementById("component-name-input");
+    const componentName = getComponentName(nameInput.value, element);
+    if (selectElement.value === "full") {
+      convertHTMLToComponents(element, componentName);
+    } else if (selectElement.value === "styled") {
+      generateSimpleStyledComponent(element, componentName, pageCssRules);
+    }
+    hidePopup();
+  };
+}
+function processTextNode(node) {
+  const text = node.textContent.trim();
+  return text ? { isText: true, textContent: text, children: [] } : null;
+}
+function processChildNodes(childNodes, processElementFn) {
+  const processedChildren = [];
+  let hasTextContent = false;
+  for (const child of childNodes) {
+    if (isTextNode(child)) {
+      const text = child.textContent.trim();
+      if (text && !hasTextContent) {
+        processedChildren.push({
+          isText: true,
+          textContent: text,
+          children: []
+        });
+        hasTextContent = true;
+      }
+    } else {
+      const processed = processElementFn(child);
+      if (processed) {
+        processedChildren.push(processed);
+      }
+    }
+  }
+  return processedChildren;
+}
+function convertHTMLToComponents(rootElement, rootComponentName) {
+  let components = new Map;
+  let componentCounter = new Map;
+  function processElement(element) {
+    if (isTextNode(element)) {
+      return processTextNode(element);
+    }
+    if (!isValidElement(element)) {
+      return null;
+    }
+    const componentName = generateStyledComponentName(element.tagName, componentCounter);
+    const styles2 = getStyles(element, pageCssRules);
+    components.set(componentName, {
+      tag: element.tagName.toLowerCase(),
+      styles: styles2
+    });
+    const childNodes = Array.from(element.childNodes);
+    const processedChildren = processChildNodes(childNodes, processElement);
+    const attributes = processAttributes(element);
+    return {
+      componentName,
+      children: processedChildren,
+      textContent: "",
+      isText: false,
+      viewBox: element.viewBox,
+      attributes
+    };
+  }
+  const processedTree = processElement(rootElement);
+  const output = `
+    ${appendStyledComponents(components)}
+    ${appendJsxComponent(rootComponentName, processedTree)}
+  `;
+  return copyComponentTemplate(output);
+}
+function copyComponentTemplate(innerComponents) {
+  const fullComponent = templateComponent(innerComponents);
+  copyToClipboard(fullComponent);
+}

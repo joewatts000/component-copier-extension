@@ -6,6 +6,7 @@ import {
 } from './utils';
 import { kebabCase } from './strings';
 import { resolveCssVariables } from './resolveCssVariables';
+import { templateComputedStyles } from './templateComputedStyles';
 
 const PSEUDO_SELECTORS = [':hover', ':active', ':focus', ':visited'];
 
@@ -69,7 +70,9 @@ function templateStyles(
       .join('\n') || '';
 
   const pseudo =
-    pseudoArray?.map((rule) => transformPsuedoSelectors(rule)).join('\n') || '';
+    [
+      ...new Set(pseudoArray?.map((rule) => transformPsuedoSelectors(rule))),
+    ]?.join('\n') || '';
 
   return `
     ${css}
@@ -82,6 +85,9 @@ export const cssPropertiesToPixels = (array: [string, string][]) =>
   array.map(resolveCssVariables);
 
 export function getStyles(element: HTMLElement, cssRules: CSSRuleType[]) {
+  if (cssRules.length === 0) {
+    return templateComputedStyles(element);
+  }
   const { relevantCSS, pseudoRules } = separateRules(cssRules, element);
   const uniqueRelevantCss = cleanBorderProperties(processCSS(relevantCSS));
   const resolvedCss = cssPropertiesToPixels(
@@ -109,7 +115,8 @@ export function getAllCSSRules(): CSSRuleType[] {
         }
       }
     } catch {
-      console.warn('Stylesheet access error');
+      console.warn('! -------- Stylesheet access error -------- !');
+      return [];
     }
   }
   return rules;

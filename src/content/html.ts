@@ -16,6 +16,7 @@ export function isValidElement(element: HTMLElement) {
 
 export function processAttributes(element: HTMLElement) {
   return Array.from(element.attributes)
+    .filter((attribute: Attr) => attribute.value)
     .filter(
       (attribute: Attr) => !ignoredHtmlAttributes.includes(attribute.name)
     )
@@ -77,6 +78,9 @@ export function niceNameForTag(tagName: string) {
   }
   if (tagName === 'NAV') {
     return 'Navigation';
+  }
+  if (tagName === 'g') {
+    return 'Group';
   }
 
   const lower = tagName.toLowerCase();
