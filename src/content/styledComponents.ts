@@ -1,6 +1,6 @@
 import { getStyles } from './css';
 import { copyToClipboard } from './utils';
-import { capitalize } from './strings';
+import { niceNameForTag, webComponentToDiv } from './html';
 
 export function generateSimpleStyledComponent(
   element: HTMLElement,
@@ -28,8 +28,9 @@ export function generateStyledComponent(
   styles: StyleObject | string,
   elementType: string
 ) {
+  const nonWebComponent = webComponentToDiv(elementType);
   return `
-    const ${componentName} = styled.${elementType}\`
+    const ${componentName} = styled.${nonWebComponent}\`
       ${styles}
     \`;
   `;
@@ -39,10 +40,13 @@ export function generateStyledComponentName(
   tagName: string,
   componentCounter: Map<string, number>
 ) {
-  const count = componentCounter.get(tagName) || 0;
-  componentCounter.set(tagName, count + 1);
-  const capitalizedTag = capitalize(tagName);
-  return `${capitalizedTag}_${count}`;
+  const niceName = niceNameForTag(tagName);
+  const count = componentCounter.get(niceName) || 0;
+  componentCounter.set(niceName, count + 1);
+  if (count === 0) {
+    return niceName;
+  }
+  return `${niceName}_${count}`;
 }
 
 type StyleObject = Record<string, string>;

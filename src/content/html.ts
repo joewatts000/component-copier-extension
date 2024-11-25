@@ -1,4 +1,5 @@
 import { ignoredHtmlAttributes } from './constants';
+import { capitalize, kebabToCamel } from './strings';
 
 export function isTextNode(node: HTMLDivElement | Text) {
   return node.nodeType === 3;
@@ -32,4 +33,58 @@ export function processAttributes(element: HTMLElement) {
       acc[attribute.name] = attribute.value;
       return acc;
     }, {});
+}
+
+export function niceNameForTag(tagName: string) {
+  if (tagName === 'IMG') {
+    return 'Image';
+  }
+  if (tagName === 'A') {
+    return 'Anchor';
+  }
+  if (tagName === 'P') {
+    return 'Text';
+  }
+  if (tagName === 'H1') {
+    return 'Heading';
+  }
+  if (tagName === 'H2') {
+    return 'Subheading';
+  }
+  if (tagName === 'H3') {
+    return 'Subheading3';
+  }
+  if (tagName === 'H4') {
+    return 'Subheading4';
+  }
+  if (tagName === 'H5') {
+    return 'Subheading5';
+  }
+  if (tagName === 'H6') {
+    return 'Subheading6';
+  }
+  if (tagName === 'UL') {
+    return 'UnorderedList';
+  }
+  if (tagName === 'OL') {
+    return 'OrderedList';
+  }
+  if (tagName === 'LI') {
+    return 'ListItem';
+  }
+  if (tagName === 'DIV') {
+    return 'Box';
+  }
+
+  const lower = tagName.toLowerCase();
+  const camel = kebabToCamel(lower); // for web components
+  return capitalize(camel);
+}
+
+export function webComponentToDiv(elementType: string) {
+  // if the elementType is kebab case its a web component so just return a div
+  if (elementType.includes('-')) {
+    return 'div';
+  }
+  return elementType;
 }

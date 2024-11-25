@@ -1,4 +1,5 @@
 import { specialChars } from './constants';
+import { niceNameForTag } from './html';
 import { capitalize, kebabCase, removeWeirdSpaces } from './strings';
 
 function cssObjectsToString(obj1: object, obj2?: object) {
@@ -27,8 +28,7 @@ function splitCssRules(rule: { cssText: string }) {
 }
 
 function generateComponentName(element: HTMLElement) {
-  const tagName = element.tagName.toLowerCase();
-  return `${capitalize(tagName)}`;
+  return niceNameForTag(element.tagName);
 }
 
 function copyToClipboard(text: string) {
