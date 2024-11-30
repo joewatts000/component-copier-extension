@@ -47,6 +47,10 @@ var styles = `
       --border-radius: 24px;
     }
 
+    #${POPUP_ID} * {
+      box-sizing: border-box;
+    }
+
     #${POPUP_ID} h3 {
       margin: 0 0 16px;
       font-weight: normal;
@@ -69,9 +73,12 @@ var styles = `
       border: 1px solid #333;
       border-radius: var(--border-radius);
       min-width: 280px;
+      width: calc(100% - 16px);
     }
 
     .select-wrapper {
+      width: calc(100% - 16px);
+      min-width: 280px;
       background-color: white;
       border-radius: var(--border-radius);
     }
@@ -84,6 +91,7 @@ var styles = `
       appearance: none !important;
       padding-right: 2rem !important;
       color: #333;
+      width: 100%;
     }
 
     #${POPUP_ID} button {
@@ -102,6 +110,14 @@ var styles = `
       color: white;
       border-color: white;
     }
+
+    hr {
+      margin: 16px 0;
+    }
+    
+    #full-page-html {
+      margin-top: 16px;  
+    }
   </style>
 `;
 var html = `
@@ -111,12 +127,16 @@ var html = `
       <input type="text" id="component-name-input" placeholder="Enter Component Name" />
       <div class="select-wrapper">
         <select id="generated-type">
+          <option value="vanilla">Vanilla Component</option>
           <option value="full">Full Component</option>
           <option value="styled">Styled Component</option>
         </select>
       </div>
       <button type="submit">Generate Component</button>
     </form>
+    <hr />
+    <h3>Get Full Page HTML for DXS</h3>
+    <button type="button" id="full-page-html">Get Full Page HTML</button>
   </div>
 `;
 function getPopupHtml() {
@@ -522,6 +542,25 @@ function hidePopup() {
   resetCursor();
 }
 
+// src/content/generateVanillaHtml.ts
+function generateSimpleVanillaComponent(element) {
+  function applyInlineStyles(el) {
+    const computedStyles = getComputedStyle(el);
+    let styleString = "";
+    for (let i = 0;i < computedStyles.length; i++) {
+      const prop = computedStyles[i];
+      const value = computedStyles.getPropertyValue(prop);
+      styleString += `${prop}:${value};`;
+    }
+    el.setAttribute("style", styleString);
+    for (let child of el.children) {
+      applyInlineStyles(child);
+    }
+  }
+  applyInlineStyles(element);
+  return element.outerHTML;
+}
+
 // src/content/index.js
 var pickerActive = false;
 var pageCssRules;
@@ -545,8 +584,10 @@ function enablePicker() {
   pickerActive = true;
   setupCursor();
   getAllPageCss();
-  insertPopupHtml();
-  addPickerEventListeners();
+  if (!document.getElementById(POPUP_ID)) {
+    insertPopupHtml();
+    addPickerEventListeners();
+  }
 }
 function addPickerEventListeners() {
   document.addEventListener("click", elementPicker, { capture: true });
@@ -590,7 +631,20 @@ function elementPicker(e) {
       convertHTMLToComponents(element, componentName);
     } else if (selectElement.value === "styled") {
       generateSimpleStyledComponent(element, componentName, pageCssRules);
+    } else if (selectElement.value === "vanilla") {
+      const vanillaComponent = generateSimpleVanillaComponent(element);
+      copyToClipboard(vanillaComponent);
     }
+    hidePopup();
+  };
+  const fullPageHtmlButton = document.getElementById("full-page-html");
+  fullPageHtmlButton.onclick = () => {
+    const popup = document.getElementById(POPUP_ID);
+    if (popup) {
+      popup.remove();
+    }
+    const fullPageHtml = document.documentElement.outerHTML;
+    copyToClipboard(fullPageHtml);
     hidePopup();
   };
 }

@@ -17,6 +17,8 @@ import { resetCursor, setupCursor } from './cursor';
 import { getAllCSSRules, getStyles } from './css';
 import { isTextNode, isValidElement, processAttributes } from './html';
 import { capitalize, removeWhiteSpace } from './strings';
+import { POPUP_ID } from './constants';
+import { generateSimpleVanillaComponent } from './generateVanillaHtml';
 
 let pickerActive = false;
 let pageCssRules;
@@ -44,8 +46,10 @@ function enablePicker() {
   pickerActive = true;
   setupCursor();
   getAllPageCss();
-  insertPopupHtml();
-  addPickerEventListeners();
+  if (!document.getElementById(POPUP_ID)) {
+    insertPopupHtml();
+    addPickerEventListeners();
+  }
 }
 
 function addPickerEventListeners() {
@@ -98,8 +102,23 @@ function elementPicker(e) {
       convertHTMLToComponents(element, componentName);
     } else if (selectElement.value === 'styled') {
       generateSimpleStyledComponent(element, componentName, pageCssRules);
+    } else if (selectElement.value === 'vanilla') {
+      const vanillaComponent = generateSimpleVanillaComponent(element);
+      copyToClipboard(vanillaComponent);
     }
 
+    hidePopup();
+  };
+
+  const fullPageHtmlButton = document.getElementById('full-page-html');
+  fullPageHtmlButton.onclick = () => {
+    // remove popup form from html
+    const popup = document.getElementById(POPUP_ID);
+    if (popup) {
+      popup.remove();
+    }
+    const fullPageHtml = document.documentElement.outerHTML;
+    copyToClipboard(fullPageHtml);
     hidePopup();
   };
 }
