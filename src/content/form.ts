@@ -3,26 +3,36 @@ import { POPUP_ID } from './constants';
 const styles = `
   <style>
     #${POPUP_ID} {
-      font-family: sans-serif;
+      font-family: 'Roboto', sans-serif;
       font-size: 15px;
       position: fixed; 
       top: 20px; 
       left: 20px; 
-      background-color: #333; 
+      background-color: #fff; 
       padding: 20px;  
       z-index: 10000;
       text-align: center;
       --border-radius: 24px;
+      --mainInputHeight: 35px;
+      --accentPrimary: #00b4ff;
+      --textPrimary: #272b3a;
+      --accentPrimaryHover: #55d1ff;
+      color: var(--textPrimary);
     }
 
     #${POPUP_ID} * {
       box-sizing: border-box;
     }
 
+    #${POPUP_ID} #e2-logo {
+      width: 60px;
+    }
+
     #${POPUP_ID} h3 {
       margin: 0 0 16px;
       font-weight: normal;
-      color: white;
+      font-size: 18px;
+      color: var(--textPrimary);
     }
 
     #${POPUP_ID} form {
@@ -35,7 +45,7 @@ const styles = `
 
     #${POPUP_ID} input, #${POPUP_ID} select {
       background: white;
-      color: #333;
+      color: var(--textPrimary);
       padding: 10px 16px;
       font-size: 16px;
       border: 1px solid #333;
@@ -58,25 +68,35 @@ const styles = `
       -webkit-appearance: none !important; 
       appearance: none !important;
       padding-right: 2rem !important;
-      color: #333;
+      color: var(--textPrimary);
       width: 100%;
     }
 
     #${POPUP_ID} button {
-      padding: 8px 16px;
       font-size: 16px;
-      border-radius: var(--border-radius);
-      border: 1px solid #333;
-      background-color: white;
-      color: #333;
       cursor: pointer;
       transition: all 0.2s ease-in-out;
+
+      line-height: normal;
+      overflow: visible;
+      cursor: pointer;
+      background-color: var(--accentPrimary);
+      color: white;
+      padding: 0.2rem 1rem;
+      height: var(--mainInputHeight);
+      width: auto;
+      border-radius: 3px;
+      border: 0;
+      transition: 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
     }
 
     #${POPUP_ID} button:hover {
-      background-color: #333;
+      background-color: var(--accentPrimaryHover);
       color: white;
-      border-color: white;
     }
 
     hr {
@@ -91,13 +111,14 @@ const styles = `
 
 const html = `
   <div id="${POPUP_ID}" style="display:none;">
-    <h3>Customize Component</h3>
+    <svg id="e2-logo" data-name="Ebene 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 62.36 62.36"><defs><style>.cls-1{fill:none;}.cls-2{fill:#131631;}.cls-3{fill:#9ccff3;}.cls-4{fill:#00b4ff;}</style></defs><title>e2-logo-blueDark-RGB</title><rect class="cls-1" x="1.42" y="1.42" width="59.53" height="59.53"></rect><path class="cls-2" d="M34.91,31.21a3.91,3.91,0,1,1-3.9-3.9V1.93A29.29,29.29,0,1,0,60.29,31.21Z"></path><path class="cls-3" d="M31,1.93H60.29V31.21A29.28,29.28,0,0,0,31,1.93Z"></path><path class="cls-4" d="M31,1.93V27.31a3.91,3.91,0,0,1,3.9,3.9H60.29A29.28,29.28,0,0,0,31,1.93Z"></path></svg>
+    <h3>Copy Component</h3>
     <form id="react-component-generator-form">
-      <input type="text" id="component-name-input" placeholder="Enter Component Name" />
+      <input type="text" id="component-name-input" placeholder="Component Name" />
       <div class="select-wrapper">
         <select id="generated-type">
           <option value="vanilla">Vanilla Component</option>
-          <option value="full">Full Component</option>
+          <option value="full">React Component</option>
           <option value="styled">Styled Component</option>
         </select>
       </div>
@@ -105,7 +126,7 @@ const html = `
     </form>
     <hr />
     <h3>Get Full Page HTML for DXS</h3>
-    <button type="button" id="full-page-html">Get Full Page HTML</button>
+    <button type="button" id="full-page-html">Get HTML</button>
   </div>
 `;
 
